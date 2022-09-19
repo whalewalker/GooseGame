@@ -19,7 +19,7 @@ public class PlayGame {
         System.out.println(GREEN_BOLD + "*********** Hello Welcome To Goose Game! *********** " +
                 getGameCommand() + RESET);
 
-        while (!gooseGame.isWin()) {
+        while (gooseGame.getWin()) {
             String terminalMessage = "Enter command: ";
             System.out.printf("\n%s", terminalMessage);
             String userInput = scanner.nextLine();

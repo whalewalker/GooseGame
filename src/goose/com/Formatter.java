@@ -31,7 +31,7 @@ public enum Formatter {
             return new StringBuilder(action.equals("bridge") ?
                     BRIDGE_MESSAGE : action.equals("goose") ?
                     String.valueOf(pieceMovement.get(0)) :
-                    action.equals("bounce") ? String.valueOf(WIN) : to);
+                    action.equals("bounce") ? String.valueOf(WIN_COUNT) : to);
         }
     },
 
@@ -86,9 +86,9 @@ public enum Formatter {
     PRANK {
         @Override
         StringBuilder format(StringBuilder builder, MessageFormatter formatter) {
-            return builder.append(String.format(". On %s there is %s, %s %s", formatter.getCurrentPlayer().getPreviousPieceCount(),
+            return builder.append(String.format(". On %s there is %s, %s %s", formatter.getCurrentPlayer().getPreviousPosition(),
                     formatter.getPrankPlayer().getName(), PRANK_MESSAGE,
-                    formatter.getPrankPlayer().getPreviousPieceCount()
+                    formatter.getPrankPlayer().getPreviousPosition()
             ));
         }
     };

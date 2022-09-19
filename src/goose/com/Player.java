@@ -2,26 +2,22 @@ package goose.com;
 
 public class Player {
     private String name;
-    private int previousPieceCount;
+    private int previousPosition;
 
     public Player(String name) {
         this.name = name;
-        this.previousPieceCount = 0;
+        this.previousPosition = 0;
     }
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public int getPreviousPosition() {
+        return previousPosition;
     }
 
-    public int getPreviousPieceCount() {
-        return previousPieceCount;
-    }
-
-    public void setPreviousPieceCount(int previousPieceCount) {
-        this.previousPieceCount = previousPieceCount;
+    public void setPreviousPosition(int previousPosition) {
+        this.previousPosition = previousPosition;
     }
 }

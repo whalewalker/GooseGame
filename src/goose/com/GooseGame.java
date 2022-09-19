@@ -1,6 +1,6 @@
 package goose.com;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import static goose.com.GameConstant.*;
@@ -15,13 +15,13 @@ public class GooseGame {
     public GooseGame() {
         this.board = new String[63];
         this.win = false;
-        this.players = new HashMap<>();
+        this.players = new LinkedHashMap<>();
         this.messageLogger = new StringBuilder();
         this.messageFormatter = new MessageFormatter();
     }
 
-    public boolean isWin() {
-        return win;
+    public boolean getWin() {
+        return !win;
     }
 
     public void setWin(boolean win) {
@@ -48,13 +48,12 @@ public class GooseGame {
         return players;
     }
 
-    public Player addPlayer(String playerName) throws GooseGameException {
-        if (players.containsKey(playerName)) {
+    public void addPlayer(String playerName) throws GooseGameException {
+        if (players.containsKey(playerName.toLowerCase())) {
             throw new GooseGameException(String.format("%s: already existing player", playerName));
         }
-        Player savedPlayer = savePlayer(new Player(playerName));
+        savePlayer(new Player(playerName.toLowerCase()));
         logMessage();
-        return savedPlayer;
     }
 
     private void logMessage() {
@@ -68,87 +67,87 @@ public class GooseGame {
     public void makeMove(String playerName, int die1, int die2) throws GooseGameException {
         Player currentPlayer = getAPlayer(playerName);
         if (currentPlayer == null) {
-            throw new GooseGameException(String.format("%s: %s", playerName, "is not a player"));
+            throw new GooseGameException(String.format("%s: %s", playerName.toLowerCase(), "is not a player"));
         }
         movePlayerPieceOnBoard(currentPlayer, die1, die2);
     }
 
     private void movePlayerPieceOnBoard(Player currentPlayer, int die1, int die2) {
         String playerOnSpace;
-        int pieceCount = currentPlayer.getPreviousPieceCount() + (die1 + die2);
+        int position = currentPlayer.getPreviousPosition() + (die1 + die2);
         setupMessageFormatter(currentPlayer, die1, die2);
 
-        if (pieceCount > this.board.length - 1) {
-            int newPieceCount = currentPlayer.getPreviousPieceCount() + 1;
-            playerOnSpace = getPlayerOnSpace(newPieceCount);
-            updatePreviousPlayerOnSpace(currentPlayer.getPreviousPieceCount(), playerOnSpace);
-            movePlayerToSpace(currentPlayer.getName(), newPieceCount);
-            updateCurrentPlayerOnSpace(currentPlayer, newPieceCount, currentPlayer.getPreviousPieceCount());
-            if (!isWin()) messageFormatter.setAction("bounce");
+        if (position > this.board.length) {
+            int newPosition = currentPlayer.getPreviousPosition() + 1;
+            playerOnSpace = getPlayerOnSpace(newPosition);
+            updatePreviousPlayerOnSpace(currentPlayer.getPreviousPosition(), playerOnSpace);
+            movePlayerToSpace(currentPlayer.getName(), newPosition);
+            updateCurrentPlayerOnSpace(currentPlayer, newPosition);
+            if (getWin()) messageFormatter.setAction("bounce");
         } else {
-            playerOnSpace = getPlayerOnSpace(pieceCount);
-            updatePreviousPlayerOnSpace(currentPlayer.getPreviousPieceCount(), playerOnSpace);
-            int count = movePlayerToSpace(currentPlayer.getName(), pieceCount, die1, die2);
-            updateCurrentPlayerOnSpace(currentPlayer, count, count);
+            playerOnSpace = getPlayerOnSpace(position);
+            updatePreviousPlayerOnSpace(currentPlayer.getPreviousPosition(), playerOnSpace);
+            int count = movePlayerToSpace(currentPlayer.getName(), position, die1, die2);
+            updateCurrentPlayerOnSpace(currentPlayer, count);
         }
         formatMessageLogger();
     }
 
-    private void updateCurrentPlayerOnSpace(Player currentPlayer, int newPieceCount, int previousPieceCount) {
-        updatePlayer(currentPlayer, newPieceCount);
-        updateMessageDto(previousPieceCount, currentPlayer);
+    private void updateCurrentPlayerOnSpace(Player currentPlayer, int newPosition) {
+        updatePlayer(currentPlayer, newPosition);
+        updateMessageDto(currentPlayer);
     }
 
-    private void updatePreviousPlayerOnSpace(int pieceCount, String playerOnSpace) {
-        removePlayerFromPreviousSpace(pieceCount);
-        updatePrankPlayerMove(playerOnSpace, pieceCount);
+    private void updatePreviousPlayerOnSpace(int position, String playerOnSpace) {
+        removePlayerFromPreviousSpace(position);
+        updatePrankPlayerMove(playerOnSpace, position);
     }
 
     private void setupMessageFormatter(Player currentPlayer, int die1, int die2) {
         messageFormatter.setDie1(die1);
         messageFormatter.setDie2(die2);
-        if (currentPlayer.getPreviousPieceCount() == 0)
+        if (currentPlayer.getPreviousPosition() == 0)
             messageFormatter.setFrom("Start");
         else
-            messageFormatter.setFrom(String.valueOf(currentPlayer.getPreviousPieceCount()));
+            messageFormatter.setFrom(String.valueOf(currentPlayer.getPreviousPosition()));
     }
 
-    private void updateMessageDto(int previousPieceCount, Player currentPlayer) {
-        messageFormatter.setTo(String.valueOf(previousPieceCount));
+    private void updateMessageDto(Player currentPlayer) {
+        messageFormatter.setTo(String.valueOf(currentPlayer.getPreviousPosition()));
         messageFormatter.setCurrentPlayer(players.get(currentPlayer.getName()));
     }
 
-    private void updatePrankPlayerMove(String playerOnSpace, int pieceCount) {
+    private void updatePrankPlayerMove(String playerOnSpace, int position) {
         if (playerOnSpace != null) {
             messageFormatter.setAction("prank");
             Player prankPlayer = getAPlayer(playerOnSpace);
-            removePlayerFromPreviousSpace(prankPlayer.getPreviousPieceCount());
-            movePlayerToSpace(playerOnSpace, pieceCount);
-            updatePlayer(prankPlayer, pieceCount);
+            removePlayerFromPreviousSpace(prankPlayer.getPreviousPosition());
+            movePlayerToSpace(playerOnSpace, position);
+            updatePlayer(prankPlayer, position);
             messageFormatter.setPrankPlayer(players.get(prankPlayer.getName()));
         }
 
     }
 
-    private void updatePlayer(Player player, int pieceCount) {
-        player.setPreviousPieceCount(pieceCount);
+    private void updatePlayer(Player player, int position) {
+        player.setPreviousPosition(position);
         savePlayer(player);
     }
 
-    private Player savePlayer(Player player) {
-        return players.put(player.getName(), player);
+    private void savePlayer(Player player) {
+         players.put(player.getName(), player);
     }
 
-    private int movePlayerToSpace(String name, int pieceCount, int die1, int die2) {
-        int shortcutCount = getShortcut(pieceCount, die1, die2);
+    private int movePlayerToSpace(String name, int position, int die1, int die2) {
+        int shortcutCount = getShortcut(position, die1, die2);
         this.board[shortcutCount - 1] = name;
         checkWin();
         return shortcutCount;
     }
 
-    private void movePlayerToSpace(String name, int pieceCount) {
-        if (pieceCount > 0) this.board[pieceCount - 1] = name;
-         else this.board[pieceCount] = name;
+    private void movePlayerToSpace(String name, int position) {
+        if (position > 0) this.board[position - 1] = name;
+         else this.board[position] = name;
         checkWin();
     }
 
@@ -159,10 +158,10 @@ public class GooseGame {
         }
     }
 
-    private int getShortcut(int pieceCount, int die1, int die2) {
-        switch (pieceCount) {
+    private int getShortcut(int position, int die1, int die2) {
+        switch (position) {
             case 6: {
-                return Action.getShortcutCount("bridge", pieceCount, die1, die2, this.messageFormatter);
+                return Action.getShortcutCount("bridge", position, die1, die2, this.messageFormatter);
             }
             case 5:
             case 9:
@@ -170,26 +169,26 @@ public class GooseGame {
             case 18:
             case 23:
             case 27: {
-                return Action.getShortcutCount("goose", pieceCount, die1, die2, this.messageFormatter);
+                return Action.getShortcutCount("goose", position, die1, die2, this.messageFormatter);
             }
             default: {
-                return pieceCount;
+                return position;
             }
         }
     }
 
-    private void removePlayerFromPreviousSpace(int previousPieceCount) {
-        if (previousPieceCount > 0) {
-            this.board[previousPieceCount - 1] = null;
+    private void removePlayerFromPreviousSpace(int previousPosition) {
+        if (previousPosition > 0) {
+            this.board[previousPosition - 1] = null;
         }
     }
 
-    private String getPlayerOnSpace(int pieceCount) {
-        return getBoard()[pieceCount - 1];
+    private String getPlayerOnSpace(int position) {
+        return getBoard()[position - 1];
     }
 
     private Player getAPlayer(String playerName) {
-        return players.get(playerName);
+        return players.get(playerName.toLowerCase());
     }
 
     private void formatMessageLogger() {
