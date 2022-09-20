@@ -79,11 +79,13 @@ public class GooseGame {
         setupMessageFormatter(currentPlayer, die1, die2);
 
         if (position > this.board.length) {
+            removePlayerFromPreviousSpace(currentPlayer.getPreviousPosition());
             int newPosition = currentPlayer.getPreviousPosition() + 1;
             movePlayerToSpace(currentPlayer, newPosition);
             updateCurrentPlayerOnSpace(currentPlayer, newPosition);
             if (getWin()) messageFormatter.addAction("bounce");
         } else {
+            removePlayerFromPreviousSpace(currentPlayer.getPreviousPosition());
             int count = movePlayerToSpace(currentPlayer, position, die1, die2);
             updateCurrentPlayerOnSpace(currentPlayer, count);
         }
@@ -93,7 +95,7 @@ public class GooseGame {
     private void movePlayerToSpace(Player currentPlayer, int position) {
         String playerOnSpace = getPlayerOnSpace(position);
         updatePrankPlayerMove(playerOnSpace, currentPlayer.getPreviousPosition());
-        moveMarker(currentPlayer, position);
+        moveMarker(currentPlayer.getName(), position);
     }
 
     private void updatePrankPlayerMove(String playerOnSpace, int position) {
@@ -101,16 +103,16 @@ public class GooseGame {
             messageFormatter.addAction("prank");
             Player prankPlayer = getAPlayer(playerOnSpace);
             removePlayerFromPreviousSpace(prankPlayer.getPreviousPosition());
-            moveMarker(prankPlayer, position);
+            moveMarker(prankPlayer.getName(), position);
             updatePlayer(prankPlayer, position);
             messageFormatter.setPrankPlayer(players.get(prankPlayer.getName()));
         }
 
     }
 
-    private void moveMarker(Player currentPlayer, int position) {
-        if (position > 0) this.board[position - 1] = currentPlayer.getName();
-        else this.board[position] = currentPlayer.getName();
+    private void moveMarker(String  name, int position) {
+        if (position > 0) this.board[position - 1] = name;
+        else this.board[position] = name;
         checkWin();
     }
 
