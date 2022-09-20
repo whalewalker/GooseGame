@@ -52,8 +52,8 @@ public class PlayGame {
     private static String getGameCommand() {
         return "\n===== COMMAND USED IN THIS GAME ==== " +
                 "\n1. add player [player name] \n2. move [player name] [die1 value], [die2 value] " +
-                "\n3. move [player name] \n4. exit \n===== COMMAND USAGE ===== \n1. add player Pippo " +
-                "\n2. move Pippo 1, 2 \n3. move Pippo \n4. exit";
+                "\n3. move [player name] \n===== COMMAND USAGE ===== \n1. add player Pippo " +
+                "\n2. move Pippo 1, 2 \n3. move Pippo";
     }
 
 }
