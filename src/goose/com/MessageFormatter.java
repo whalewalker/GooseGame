@@ -12,8 +12,11 @@ public class MessageFormatter {
     private int gooseCount;
     private int die1;
     private int die2;
-    private String action = "default";
+    private final List<String> actions;
 
+    public MessageFormatter() {
+        actions = new ArrayList<>();
+    }
 
     public String getFrom() {
         return from;
@@ -79,11 +82,11 @@ public class MessageFormatter {
         pieceMovement.add(value);
     }
 
-    public String getAction() {
-        return action;
+    public void addAction(String action) {
+        this.actions.add(action);
     }
 
-    public void setAction(String action) {
-        this.action = action;
+    public List<String> getActions() {
+        return actions;
     }
 }

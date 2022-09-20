@@ -226,5 +226,24 @@ class GooseGameTest {
         assertEquals(63, gooseGame.getPlayers().get(playerName.toLowerCase()).getPreviousPosition());
         assertEquals(expectedMessage, actualMessage);
     }
-    //win
+
+    @Test
+    void testThatMoreThanOneShortCutCanHappenAtOnce() throws GooseGameException {
+        //First Player
+        String player1 = "Pippo";
+        gooseGame.addPlayer(player1);
+        gooseGame.makeMove(player1, 6, 6);
+        assertEquals("pippo", gooseGame.getBoard()[11]);
+        assertEquals(12, gooseGame.getPlayers().get(player1.toLowerCase()).getPreviousPosition());
+        assertEquals("pippo rolls 6, 6. pippo moves from Start to 12", gooseGame.getMessageLogger().toString());
+
+        //Second Player
+        String player2 = "Pluto";
+        gooseGame.addPlayer(player2);
+        gooseGame.makeMove(player2, 3, 3);
+        assertEquals("pluto", gooseGame.getBoard()[11]);
+        assertEquals(12, gooseGame.getPlayers().get(player2.toLowerCase()).getPreviousPosition());
+        assertEquals("pluto rolls 3, 3. pluto moves from Start to The Bridge. pluto jumps to 12. On 12 there is pippo, who returns to 0", gooseGame.getMessageLogger().toString());
+    }
+
 }

@@ -1,4 +1,6 @@
 package goose.com;
+import java.lang.reflect.Array;
+import java.util.Arrays;
 import java.util.Scanner;
 
 import static goose.com.Helper.getOperatorName;
@@ -28,6 +30,7 @@ public class PlayGame {
                 isValidCommand(userInput);
                 performOperation(userInput);
                 System.out.printf(BLUE_BOLD + "System response:=> %s\n" + RESET, gooseGame.getMessageLogger().toString());
+
                 gooseGame.resetLogger();
             } catch (GooseGameException ex) {
                 System.out.printf(RED_BOLD + "System response:=> %s\n" + RESET, ex.getMessage());

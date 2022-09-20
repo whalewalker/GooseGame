@@ -1,5 +1,6 @@
 package goose.com;
 
+import java.util.Currency;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -79,28 +80,61 @@ public class GooseGame {
 
         if (position > this.board.length) {
             int newPosition = currentPlayer.getPreviousPosition() + 1;
-            playerOnSpace = getPlayerOnSpace(newPosition);
-            updatePreviousPlayerOnSpace(currentPlayer.getPreviousPosition(), playerOnSpace);
-            movePlayerToSpace(currentPlayer.getName(), newPosition);
+            movePlayerToSpace(currentPlayer, newPosition);
             updateCurrentPlayerOnSpace(currentPlayer, newPosition);
-            if (getWin()) messageFormatter.setAction("bounce");
+            if (getWin()) messageFormatter.addAction("bounce");
         } else {
-            playerOnSpace = getPlayerOnSpace(position);
-            updatePreviousPlayerOnSpace(currentPlayer.getPreviousPosition(), playerOnSpace);
-            int count = movePlayerToSpace(currentPlayer.getName(), position, die1, die2);
+            int count = movePlayerToSpace(currentPlayer, position, die1, die2);
             updateCurrentPlayerOnSpace(currentPlayer, count);
         }
         formatMessageLogger();
     }
 
+    private void movePlayerToSpace(Player currentPlayer, int position) {
+        String playerOnSpace = getPlayerOnSpace(position);
+        updatePrankPlayerMove(playerOnSpace, currentPlayer.getPreviousPosition());
+        moveMarker(currentPlayer, position);
+    }
+
+    private void updatePrankPlayerMove(String playerOnSpace, int position) {
+        if (playerOnSpace != null) {
+            messageFormatter.addAction("prank");
+            Player prankPlayer = getAPlayer(playerOnSpace);
+            removePlayerFromPreviousSpace(prankPlayer.getPreviousPosition());
+            moveMarker(prankPlayer, position);
+            updatePlayer(prankPlayer, position);
+            messageFormatter.setPrankPlayer(players.get(prankPlayer.getName()));
+        }
+
+    }
+
+    private void moveMarker(Player currentPlayer, int position) {
+        if (position > 0) this.board[position - 1] = currentPlayer.getName();
+        else this.board[position] = currentPlayer.getName();
+        checkWin();
+    }
+
+    private void removePlayerFromPreviousSpace(int previousPosition) {
+        if (previousPosition > 0) {
+            this.board[previousPosition - 1] = null;
+        }
+    }
+
+    private void updatePlayer(Player player, int position) {
+        player.setPreviousPosition(position);
+        savePlayer(player);
+    }
+
+    private void checkWin() {
+        if (this.board[WIN_COUNT - 1] != null) {
+            setWin(true);
+            messageFormatter.addAction("win");
+        }
+    }
+
     private void updateCurrentPlayerOnSpace(Player currentPlayer, int newPosition) {
         updatePlayer(currentPlayer, newPosition);
         updateMessageDto(currentPlayer);
-    }
-
-    private void updatePreviousPlayerOnSpace(int position, String playerOnSpace) {
-        removePlayerFromPreviousSpace(position);
-        updatePrankPlayerMove(playerOnSpace, position);
     }
 
     private void setupMessageFormatter(Player currentPlayer, int die1, int die2) {
@@ -117,45 +151,20 @@ public class GooseGame {
         messageFormatter.setCurrentPlayer(players.get(currentPlayer.getName()));
     }
 
-    private void updatePrankPlayerMove(String playerOnSpace, int position) {
-        if (playerOnSpace != null) {
-            messageFormatter.setAction("prank");
-            Player prankPlayer = getAPlayer(playerOnSpace);
-            removePlayerFromPreviousSpace(prankPlayer.getPreviousPosition());
-            movePlayerToSpace(playerOnSpace, position);
-            updatePlayer(prankPlayer, position);
-            messageFormatter.setPrankPlayer(players.get(prankPlayer.getName()));
-        }
-
-    }
-
-    private void updatePlayer(Player player, int position) {
-        player.setPreviousPosition(position);
-        savePlayer(player);
-    }
 
     private void savePlayer(Player player) {
-         players.put(player.getName(), player);
+        players.put(player.getName(), player);
     }
 
-    private int movePlayerToSpace(String name, int position, int die1, int die2) {
+    private int movePlayerToSpace(Player currentPlayer, int position, int die1, int die2) {
         int shortcutCount = getShortcut(position, die1, die2);
-        this.board[shortcutCount - 1] = name;
+
+        String playerOnSpace = getPlayerOnSpace(shortcutCount);
+        updatePrankPlayerMove(playerOnSpace, currentPlayer.getPreviousPosition());
+
+        this.board[shortcutCount - 1] = currentPlayer.getName();
         checkWin();
         return shortcutCount;
-    }
-
-    private void movePlayerToSpace(String name, int position) {
-        if (position > 0) this.board[position - 1] = name;
-         else this.board[position] = name;
-        checkWin();
-    }
-
-    private void checkWin() {
-        if (this.board[WIN_COUNT - 1] != null) {
-            setWin(true);
-            messageFormatter.setAction("win");
-        }
     }
 
     private int getShortcut(int position, int die1, int die2) {
@@ -177,14 +186,11 @@ public class GooseGame {
         }
     }
 
-    private void removePlayerFromPreviousSpace(int previousPosition) {
-        if (previousPosition > 0) {
-            this.board[previousPosition - 1] = null;
-        }
-    }
-
     private String getPlayerOnSpace(int position) {
-        return getBoard()[position - 1];
+        if (position > 0){
+            return this.board[position - 1];
+        }
+        return this.board[position];
     }
 
     private Player getAPlayer(String playerName) {
@@ -193,11 +199,19 @@ public class GooseGame {
 
     private void formatMessageLogger() {
         StringBuilder builder = Action.format(DEFAULT, messageFormatter, new StringBuilder());
+        StringBuilder formattedMessage;
 
-        String message = messageFormatter.getAction().equals(DEFAULT) ? builder.toString() :
-                Action.format(messageFormatter.getAction(), messageFormatter, builder).toString();
+        if (!messageFormatter.getActions().isEmpty()) {
+            formattedMessage = builder;
+            messageFormatter.getActions().forEach(action -> {
+                formattedMessage.append(Action.format(action, messageFormatter, new StringBuilder()));
+            });
 
-        logMessage(message);
+        } else {
+            formattedMessage = builder;;
+        }
+
+        logMessage(formattedMessage.toString());
         // Reset message dto
         this.messageFormatter = new MessageFormatter();
     }

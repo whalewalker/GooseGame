@@ -25,13 +25,13 @@ public enum Formatter {
         @Override
         StringBuilder format(StringBuilder builder, MessageFormatter formatter) {
             String to = formatter.getTo();
-            String action = formatter.getAction();
+            List<String> actions = formatter.getActions();
             List<Integer> pieceMovement = formatter.getPieceMovement();
 
-            return new StringBuilder(action.equals("bridge") ?
-                    BRIDGE_MESSAGE : action.equals("goose") ?
+            return new StringBuilder(actions.contains("bridge") ?
+                    BRIDGE_MESSAGE : actions.contains("goose") ?
                     String.valueOf(pieceMovement.get(0)) :
-                    action.equals("bounce") ? String.valueOf(WIN_COUNT) : to);
+                    actions.contains("bounce") ? String.valueOf(WIN_COUNT) : to);
         }
     },
 

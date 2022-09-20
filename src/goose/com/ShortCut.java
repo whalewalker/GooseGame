@@ -8,7 +8,7 @@ public enum ShortCut {
     BRIDGE{
         @Override
         int calculate(int pieceCount, int die1, int die2, MessageFormatter formatter) {
-            formatter.setAction("bridge");
+            formatter.addAction("bridge");
             return BRIDGE_COUNT;
         }
     },
@@ -17,7 +17,7 @@ public enum ShortCut {
         int calculate(int pieceCount, int die1, int die2, MessageFormatter formatter) {
             int count = (pieceCount + die1 + die2);
             int index = 1;
-            formatter.setAction("goose");
+            formatter.addAction("goose");
             formatter.addToMove(0, pieceCount);
 
             for (; index < LIMIT; index++) {
@@ -32,6 +32,5 @@ public enum ShortCut {
     };
 
     abstract int calculate(int pieceCount, int die1, int die2, MessageFormatter formatter);
-
 
 }

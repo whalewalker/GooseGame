@@ -8,6 +8,8 @@ public interface GameConstant {
     int WIN_COUNT = 63;
     int LIMIT = 6;
 
+    String MAKE_MOVE = "move";
+    String ADD_PLAYER = "add";
     String ROLL_MESSAGE = "rolls";
     String MOVE_MESSAGE = "moves from";
     String WIN_MESSAGE = "Wins!!";
@@ -16,7 +18,6 @@ public interface GameConstant {
     String JUMP_MESSAGE = "jumps";
     String GOOSE_MESSAGE = "The Goose";
     String DEFAULT = "default";
-
     String RETRY_MESSAGE = "moves again and goes";
     String PRANK_MESSAGE = "who returns to";
 }
