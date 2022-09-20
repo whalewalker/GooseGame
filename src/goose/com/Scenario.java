@@ -4,17 +4,17 @@ import static goose.com.GameConstant.BRIDGE_COUNT;
 import static goose.com.GameConstant.LIMIT;
 import static goose.com.Helper.isGoose;
 
-public enum ShortCut {
+public enum Scenario {
     BRIDGE{
         @Override
-        int calculate(int pieceCount, int die1, int die2, MessageFormatter formatter) {
+        int apply(int pieceCount, int die1, int die2, MessageFormatter formatter) {
             formatter.addAction("bridge");
             return BRIDGE_COUNT;
         }
     },
     GOOSE{
         @Override
-        int calculate(int pieceCount, int die1, int die2, MessageFormatter formatter) {
+        int apply(int pieceCount, int die1, int die2, MessageFormatter formatter) {
             int count = (pieceCount + die1 + die2);
             int index = 1;
             formatter.addAction("goose");
@@ -31,6 +31,6 @@ public enum ShortCut {
         }
     };
 
-    abstract int calculate(int pieceCount, int die1, int die2, MessageFormatter formatter);
+    abstract int apply(int pieceCount, int die1, int die2, MessageFormatter formatter);
 
 }

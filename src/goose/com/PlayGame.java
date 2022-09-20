@@ -1,5 +1,5 @@
 package goose.com;
-import java.util.Arrays;
+
 import java.util.Scanner;
 
 import static goose.com.Helper.getOperatorName;
@@ -12,6 +12,7 @@ public class PlayGame {
     static final String GREEN_BOLD = "\033[1;32m";
 
     static GooseGame gooseGame = new GooseGame();
+    static boolean canExit = false;
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
@@ -19,22 +20,27 @@ public class PlayGame {
         System.out.println(GREEN_BOLD + "*********** Hello Welcome To Goose Game! *********** " +
                 getGameCommand() + RESET);
 
-        while (gooseGame.getWin()) {
-            String terminalMessage = "Enter command: ";
-            System.out.printf("\n%s", terminalMessage);
-            String userInput = scanner.nextLine();
+         while (gooseGame.getWin() || canExit) {
+             String userInput = getUserInput(scanner);
+             try {
+                 isValidCommand(userInput);
+                 performOperation(userInput);
+                 System.out.printf(BLUE_BOLD + "System response:=> %s\n" + RESET, gooseGame.getMessageLogger().toString());
 
-            try {
-                isValidCommand(userInput);
-                performOperation(userInput);
-                System.out.printf(BLUE_BOLD + "System response:=> %s\n" + RESET, gooseGame.getMessageLogger().toString());
+                 gooseGame.resetLogger();
+             } catch (GooseGameException ex) {
+                 System.out.printf(RED_BOLD + "System response:=> %s\n" + RESET, ex.getMessage());
+                 System.out.println(getGameCommand());
+             }
+         }
 
-                gooseGame.resetLogger();
-            } catch (GooseGameException ex) {
-                System.out.printf(RED_BOLD + "System response:=> %s\n" + RESET, ex.getMessage());
-                System.out.println(getGameCommand());
-            }
-        }
+        System.out.println(GREEN_BOLD + "Goose game ended!" + RESET);
+    }
+
+    private static String getUserInput(Scanner scanner) {
+        String terminalMessage = "Enter command: ";
+        System.out.printf("\n%s", terminalMessage);
+        return scanner.nextLine();
     }
 
     public static void performOperation(String userInput) throws GooseGameException {
@@ -46,8 +52,8 @@ public class PlayGame {
     private static String getGameCommand() {
         return "\n===== COMMAND USED IN THIS GAME ==== " +
                 "\n1. add player [player name] \n2. move [player name] [die1 value], [die2 value] " +
-                "\n3. move [player name] \n===== COMMAND USAGE ===== \n1. add player Pippo " +
-                "\n2. move Pippo 1, 2 \n3. move Pippo";
+                "\n3. move [player name] \n4. exit \n===== COMMAND USAGE ===== \n1. add player Pippo " +
+                "\n2. move Pippo 1, 2 \n3. move Pippo \n4. exit";
     }
 
 }

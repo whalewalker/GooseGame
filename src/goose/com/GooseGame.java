@@ -1,6 +1,5 @@
 package goose.com;
 
-import java.util.Currency;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -74,7 +73,6 @@ public class GooseGame {
     }
 
     private void movePlayerPieceOnBoard(Player currentPlayer, int die1, int die2) {
-        String playerOnSpace;
         int position = currentPlayer.getPreviousPosition() + (die1 + die2);
         setupMessageFormatter(currentPlayer, die1, die2);
 
@@ -172,7 +170,7 @@ public class GooseGame {
     private int getShortcut(int position, int die1, int die2) {
         switch (position) {
             case 6: {
-                return Action.getShortcutCount("bridge", position, die1, die2, this.messageFormatter);
+                return Action.scenario("bridge", position, die1, die2, this.messageFormatter);
             }
             case 5:
             case 9:
@@ -180,7 +178,7 @@ public class GooseGame {
             case 18:
             case 23:
             case 27: {
-                return Action.getShortcutCount("goose", position, die1, die2, this.messageFormatter);
+                return Action.scenario("goose", position, die1, die2, this.messageFormatter);
             }
             default: {
                 return position;

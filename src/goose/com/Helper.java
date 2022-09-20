@@ -53,7 +53,7 @@ public class Helper {
 
     static void isValidCommand(String userInput) throws GooseGameException {
         int inputLength = userInput.split(" ").length;
-        if (inputLength > 4 || inputLength < 2) throw new GooseGameException("Invalid Command");
+        if (inputLength > 4 || inputLength < 1) throw new GooseGameException("Invalid Command");
     }
 
 }

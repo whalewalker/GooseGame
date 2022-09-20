@@ -3,7 +3,7 @@ package goose.com;
 import static goose.com.Helper.getDiceValues;
 import static goose.com.Helper.getPlayerName;
 
-public enum Operator {
+public enum Command {
 
     ADD{
         void apply(String[] userInput, GooseGame gooseGame) throws GooseGameException {
