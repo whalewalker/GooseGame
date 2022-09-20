@@ -1,11 +1,8 @@
 package goose.com;
-import java.lang.reflect.Array;
-import java.util.Arrays;
 import java.util.Scanner;
 
 import static goose.com.Helper.getOperatorName;
 import static goose.com.Helper.isValidCommand;
-
 
 public class PlayGame {
     static final String RED_BOLD = "\033[1;31m";
