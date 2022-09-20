@@ -29,10 +29,6 @@ public class PlayGame {
                 performOperation(userInput);
                 System.out.printf(BLUE_BOLD + "System response:=> %s\n" + RESET, gooseGame.getMessageLogger().toString());
 
-                System.out.println("======== Game Board ======");
-                System.out.print(Arrays.toString(gooseGame.getBoard()));
-                System.out.println("\n========== ==========");
-
                 gooseGame.resetLogger();
             } catch (GooseGameException ex) {
                 System.out.printf(RED_BOLD + "System response:=> %s\n" + RESET, ex.getMessage());
